@@ -345,20 +345,20 @@ async def upload_file(
 
 
 @app.get("/messages/{user_id}/{other_user_id}", response_model=List[MessageResponse])
-async def get_messages(user_id: int, other_user_id: int, db: Session = Depends(get_db)):
+async def get_messages(user_id: int, other_user_id: int, limit: int = 50, offset: int = 0, db: Session = Depends(get_db)):
     messages = db.query(Message).filter(
         ((Message.sender_id == user_id) & (Message.receiver_id == other_user_id)) |
         ((Message.sender_id == other_user_id) & (Message.receiver_id == user_id))
-    ).order_by(Message.created_at).all()
-    return messages
+    ).order_by(Message.created_at.desc()).offset(offset).limit(limit).all()
+    return list(reversed(messages))
 
 
 @app.get("/messages/group/{group_id}", response_model=List[MessageResponse])
-async def get_group_messages(group_id: int, db: Session = Depends(get_db)):
+async def get_group_messages(group_id: int, limit: int = 50, offset: int = 0, db: Session = Depends(get_db)):
     messages = db.query(Message).filter(
         Message.group_id == group_id
-    ).order_by(Message.created_at).all()
-    return messages
+    ).order_by(Message.created_at.desc()).offset(offset).limit(limit).all()
+    return list(reversed(messages))
 
 @app.put("/messages/{message_id}")
 async def edit_message(message_id: int, data: MessageUpdate, user_id: int, db: Session = Depends(get_db)):
