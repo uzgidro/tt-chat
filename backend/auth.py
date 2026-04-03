@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 import bcrypt
-from jose import jwt
+import jwt
 import os
 
 # Секретный ключ для JWT токенов — берём из переменной окружения
@@ -38,5 +38,5 @@ def decode_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
-    except:
+    except jwt.PyJWTError:
         return None
