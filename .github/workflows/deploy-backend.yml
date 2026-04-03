@@ -104,7 +104,8 @@ jobs:
     needs: [verify-image, rebuild-no-cache]
     if: |
       always() &&
-      (needs.verify-image.outputs.scan-failed != 'true' || needs.rebuild-no-cache.result == 'success')
+      needs.verify-image.result == 'success' &&
+      (needs.rebuild-no-cache.result == 'success' || needs.rebuild-no-cache.result == 'skipped')
 
     steps:
       - name: Trigger Watchtower Update
